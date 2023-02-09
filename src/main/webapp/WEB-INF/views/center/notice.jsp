@@ -1,5 +1,4 @@
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="com.itwillbs.board.db.BoardDTO"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -10,8 +9,8 @@
 <head>
 <meta charset="UTF-8">
 <title>center/notice.jsp</title>
-<link href="./css/default.css" rel="stylesheet" type="text/css">
-<link href="./css/subpage.css" rel="stylesheet" type="text/css">
+<link href="${pageContext.request.contextPath }/resources/css/default.css" rel="stylesheet" type="text/css">
+<link href="${pageContext.request.contextPath }/resources/css/subpage.css" rel="stylesheet" type="text/css">
 <!--[if lt IE 9]>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js" type="text/javascript"></script>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/ie7-squish.js" type="text/javascript"></script>
@@ -27,14 +26,6 @@
  </script>
  <![endif]-->
 </head>
-<%
-List<BoardDTO> boardList =(List<BoardDTO>)request.getAttribute("boardList");
-int startPage=(Integer)request.getAttribute("startPage");
-int pageBlock=(Integer)request.getAttribute("pageBlock");
-int currentPage=(Integer)request.getAttribute("currentPage");
-int endPage=(Integer)request.getAttribute("endPage");
-int pageCount=(Integer)request.getAttribute("pageCount");
-%>
 <body>
 <div id="wrap">
 <!-- 헤더들어가는 곳 -->
@@ -49,9 +40,9 @@ int pageCount=(Integer)request.getAttribute("pageCount");
 <!-- 왼쪽메뉴 -->
 <nav id="sub_menu">
 <ul>
-<li><a href="./BoardList.bo">Notice</a></li>
-<li><a href="./ReBoardList.bo">1:1 문의</a></li>
-<li><a href="./FileBoardList.bo">Driver Download</a></li>
+<li><a href="${pageContext.request.contextPath }/board/list">Notice</a></li>
+<li><a href="${pageContext.request.contextPath }/board/relist">1:1 문의</a></li>
+<li><a href="${pageContext.request.contextPath }/board/flist">Driver Download</a></li>
 <li><a href="#">Service Policy</a></li>
 </ul>
 </nav>
@@ -83,7 +74,7 @@ int pageCount=(Integer)request.getAttribute("pageCount");
 <!-- } -->
 <!-- %> -->
 <c:forEach var="dto" items="${boardList }">
-<tr onclick="location.href='./BoardContent.bo?num=${dto.num}'">
+<tr onclick="location.href='${pageContext.request.contextPath }/board/content?num=${dto.num}'">
     <td>${dto.num}</td>
     <td class="left">${dto.subject}</td>
     <td>${dto.name}</td>
@@ -112,23 +103,22 @@ onclick="location.href='./BoardWriteForm.bo'">
 </div>
 <div class="clear"></div>
 <div id="page_control">
-<%
-if(startPage > pageBlock){
-	%>
-	<a href="./BoardList.bo?pageNum=<%=startPage-pageBlock%>">Prev</a>
-	<%
-}
-for(int i=startPage;i<=endPage;i++){
-	%>
-	<a href="./BoardList.bo?pageNum=<%=i%>"><%=i %></a>
-	<%
-}
-if(endPage < pageCount){
-	%>
-	<a href="./BoardList.bo?pageNum=<%=startPage+pageBlock%>">Next</a>
-	<%
-}
-%>
+
+<c:if test="${pageDto.startPage > pageDto.pageBlock}">
+	<a href="${pageContext.request.contextPath }/board/list?pageNum=${pageDto.startPage - pageDto.pageBlock }">[10페이지이전]</a>
+</c:if>	
+
+	<a href="${pageContext.request.contextPath }/board/list?pageNum=${pageDto.currentPage - 1 }">[이전]</a>
+	
+<c:forEach var="i" begin="${pageDto.startPage }" end="${pageDto.endPage }" step="1">
+	<a href="${pageContext.request.contextPath }/board/list?pageNum=${i}">${i }</a>
+</c:forEach>
+
+	<a href="${pageContext.request.contextPath }/board/list?pageNum=${pageDto.currentPage + 1 }">[다음]</a>
+	
+<c:if test="${pageDto.endPage < pageDto.pageCount}">
+	<a href="${pageContext.request.contextPath }/board/list?pageNum=${pageDto.startPage + pageDto.pageBlock }">[10페이지다음]</a>
+</c:if>	
 
 
 </div>

@@ -7,7 +7,7 @@
 <title>member/join.jsp</title>
 <link href="${pageContext.request.contextPath }/resources/css/default.css" rel="stylesheet" type="text/css">
 <link href="${pageContext.request.contextPath }/resources/css/subpage.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="./script/jquery-3.6.3.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/resources/script/jquery-3.6.3.js"></script>
 <script type="text/javascript">
  	$(document).ready(function() {
 //  		alert("시작");
@@ -19,10 +19,20 @@
 		$('.dup').click(function(){
 // 			alert("아이디 중복체크");
 			//대상 가상주소 => 자바파일에 메서드
+			if($('.id').val() == "" ){
+				alert("아이디 입력하세요");
+				$('.id').focus();
+				return false;
+			}
 			$.ajax({
-				url:'./MemberIdCheck.me',
+				url:'${pageContext.request.contextPath }/member/idCheck',
 				data:{'id':$('.id').val()},
 				success: function(rdata){
+					if(rdata=='iddup'){
+						rdata="아이디 중복";
+					} else {
+						rdata="아이디 사용가능";
+					}
 					$('.dupdiv').html(rdata);
 				}
 			});
