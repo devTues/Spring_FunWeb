@@ -1,27 +1,13 @@
-<%@page import="com.itwillbs.board.db.BoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+       <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>center/fcontent.jsp</title>
-<link href="./css/default.css" rel="stylesheet" type="text/css">
-<link href="./css/subpage.css" rel="stylesheet" type="text/css">
-<!--[if lt IE 9]>
-<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js" type="text/javascript"></script>
-<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/ie7-squish.js" type="text/javascript"></script>
-<script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-<![endif]-->
-<!--[if IE 6]>
- <script src="../script/DD_belatedPNG_0.0.8a.js"></script>
- <script>
-   /* EXAMPLE */
-   DD_belatedPNG.fix('#wrap');
-   DD_belatedPNG.fix('#main_img');   
-
- </script>
- <![endif]-->
+<link href="${pageContext.request.contextPath }/resources/css/default.css" rel="stylesheet" type="text/css">
+<link href="${pageContext.request.contextPath }/resources/css/subpage.css" rel="stylesheet" type="text/css">
 </head>
 <%
 //세션값 가져오기
@@ -42,47 +28,38 @@ String id=(String)session.getAttribute("id");
 <!-- 왼쪽메뉴 -->
 <nav id="sub_menu">
 <ul>
-<li><a href="./BoardList.bo">Notice</a></li>
-<li><a href="./ReBoardList.bo">1:1 문의</a></li>
-<li><a href="./FileBoardList.bo">Driver Download</a></li>
+<li><a href="${pageContext.request.contextPath }/board/list">Notice</a></li>
+<li><a href="${pageContext.request.contextPath }/board/relist">1:1 문의</a></li>
+<li><a href="${pageContext.request.contextPath }/board/flist">Driver Download</a></li>
 <li><a href="#">Service Policy</a></li>
 </ul>
 </nav>
 <!-- 왼쪽메뉴 -->
-<%
-BoardDTO dto=(BoardDTO)request.getAttribute("dto");
-%>
 <!-- 게시판 -->
 <article>
 <h1>File Notice Content</h1>
 <table id="notice">
-<tr><td>글번호</td><td><%=dto.getNum() %></td></tr>
-<tr><td>글쓴이</td><td><%=dto.getName() %></td></tr>   
-<tr><td>등록일</td><td><%=dto.getDate() %></td></tr>   
-<tr><td>조회수</td><td><%=dto.getReadcount() %></td></tr> 
-<tr><td>글제목</td><td><%=dto.getSubject() %></td></tr>
+<tr><td>글번호</td><td>${boardDTO.num}</td></tr>
+<tr><td>글쓴이</td><td>${boardDTO.name}</td></tr>   
+<tr><td>등록일</td><td>${boardDTO.date}</td></tr>   
+<tr><td>조회수</td><td>${boardDTO.readcount}</td></tr> 
+<tr><td>글제목</td><td>${boardDTO.subject}</td></tr>
 <tr><td>첨부파일</td>
-<td><a href="./upload/<%=dto.getFile() %>" download><%=dto.getFile() %></a>
-<img src="./upload/<%=dto.getFile() %>" width="50" height="50">
+<td><a href="./upload/${boardDTO.file}" download>${boardDTO.file}</a>
+<img src="${pageContext.request.contextPath }/resources/upload/${boardDTO.file}" width="50" height="50">
 </td></tr>
-<tr><td>글내용</td><td><%=dto.getContent() %></td></tr>
+<tr><td>글내용</td><td>${boardDTO.content}</td></tr>
 </table>
 <div id="table_search">
-<%
-//글쓴이dto.getName()   로그인(세션 id)  일치하면 => 글수정, 글삭제 보이기
-if(id!=null){
-	if(dto.getName().equals(id)){
-	%>
-<input type="button" value="글수정" class="btn"
- onclick="location.href='./FileBoardUpdateForm.bo?num=<%=dto.getNum()%>'">
- <input type="button" value="글삭제" class="btn"
- onclick="location.href='./FileBoardDelete.bo?num=<%=dto.getNum()%>'">	
-	<%
-	}
-}
-%>
+<c:if test="${boardDTO.name eq sessionScope.id }">
+	<input type="button" value="글수정" class="btn"
+	onclick="location.href='${pageContext.request.contextPath }/board/update?num=${boardDTO.num }'">
+	<input type="button" value="글삭제" class="btn"
+	onclick="location.href='${pageContext.request.contextPath }/board/delete?num=${boardDTO.num }'">
+</c:if>
 <input type="button" value="글목록" class="btn"
- onclick="location.href='./FileBoardList.bo'">
+	onclick="location.href='${pageContext.request.contextPath }/board/flist'">
+ 
 </div>	
 
 <div class="clear"></div>

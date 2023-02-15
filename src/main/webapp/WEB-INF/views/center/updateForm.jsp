@@ -23,13 +23,6 @@
  </script>
  <![endif]-->
 </head>
-<%
-//세션값 가져오기
-String id=(String)session.getAttribute("id");
-if(id==null){
-	response.sendRedirect("./BoardList.bo");
-}
-%>
 <body>
 <div id="wrap">
 <!-- 헤더들어가는 곳 -->
@@ -51,9 +44,6 @@ if(id==null){
 </ul>
 </nav>
 <!-- 왼쪽메뉴 -->
-<%
-BoardDTO dto=(BoardDTO)request.getAttribute("dto");
-%>
 <!-- 게시판 -->
 <article>
 <h1>Notice Update</h1>

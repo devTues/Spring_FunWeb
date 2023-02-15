@@ -11,20 +11,6 @@
 <title>center/notice.jsp</title>
 <link href="${pageContext.request.contextPath }/resources/css/default.css" rel="stylesheet" type="text/css">
 <link href="${pageContext.request.contextPath }/resources/css/subpage.css" rel="stylesheet" type="text/css">
-<!--[if lt IE 9]>
-<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js" type="text/javascript"></script>
-<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/ie7-squish.js" type="text/javascript"></script>
-<script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-<![endif]-->
-<!--[if IE 6]>
- <script src="../script/DD_belatedPNG_0.0.8a.js"></script>
- <script>
-   /* EXAMPLE */
-   DD_belatedPNG.fix('#wrap');
-   DD_belatedPNG.fix('#main_img');   
-
- </script>
- <![endif]-->
 </head>
 <body>
 <div id="wrap">
@@ -57,22 +43,6 @@
     <th class="twrite">Writer</th>
     <th class="tdate">Date</th>
     <th class="tread">Read</th></tr>
-<%-- <% --%>
-<!-- // 날짜 => 모양 문자열 변경 -->
-<!-- SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy.MM.dd"); -->
-
-<!-- for(int i=0;i<boardList.size();i++){ -->
-<!-- 	BoardDTO dto=boardList.get(i); -->
-<!-- 	%> -->
-<%-- <tr onclick="location.href='./BoardContent.bo?num=<%=dto.getNum()%>'"> --%>
-<%--     <td><%=dto.getNum() %></td> --%>
-<%--     <td class="left"><%=dto.getSubject() %></td> --%>
-<%--     <td><%=dto.getName() %></td> --%>
-<%--     <td><%=dateFormat.format(dto.getDate()) %></td> --%>
-<%--     <td><%=dto.getReadcount() %></td></tr> 	 --%>
-<%-- 	<% --%>
-<!-- } -->
-<!-- %> -->
 <c:forEach var="dto" items="${boardList }">
 <tr onclick="location.href='${pageContext.request.contextPath }/board/content?num=${dto.num}'">
     <td>${dto.num}</td>
@@ -83,19 +53,10 @@
 </c:forEach>
 
 </table>
-<%
-//세션값 가져오기
-String id=(String)session.getAttribute("id");
-//세션값이 있으면 (로그인 함) => 글쓰기 버튼 보이기
-if(id!=null){
-	%>
 <div id="table_search">
 <input type="button" value="글쓰기" class="btn" 
-onclick="location.href='./BoardWriteForm.bo'">
+onclick="location.href='${pageContext.request.contextPath }/board/write'">
 </div>	
-	<%
-}
-%>
 
 <div id="table_search">
 <input type="text" name="search" class="input_box">

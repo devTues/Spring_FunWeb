@@ -32,7 +32,7 @@ if(id==null){
 <ul>
 <li><a href="${pageContext.request.contextPath }/board/list">Notice</a></li>
 <li><a href="${pageContext.request.contextPath }/board/relist">1:1 문의</a></li>
-<li><a href="${pageContext.request.contextPath }/board/flist.bo">Driver Download</a></li>
+<li><a href="${pageContext.request.contextPath }/board/flist">Driver Download</a></li>
 <li><a href="#">Service Policy</a></li>
 </ul>
 </nav>

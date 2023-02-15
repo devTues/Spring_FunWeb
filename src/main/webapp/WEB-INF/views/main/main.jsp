@@ -49,12 +49,15 @@
 						
 //----------------------------------------------------			
 			$.ajax({
-				url:"./BoardListMain.bo",
+				url:"${pageContext.request.contextPath }/board/mainlist",
 				dataType:'json',
 				success:function(arr){
 					// 반복
 					$.each(arr,function(index,item){
-						$('table').append('<tr><td class="contxt"><a href="#">'+item.subject+'</a></td><td>'+item.date+'</td></tr>');
+						// 숫자 => 날짜 => 문자출력(연,월,일)
+						var dt=new Date(item.date);
+						var d=dt.getFullYear()+"."+(dt.getMonth()+1)+"."+dt.getDate();
+						$('table').append('<tr><td class="contxt"><a href="#">'+item.subject+'</a></td><td>'+d+'</td></tr>');
 					});
 				}
 			});
