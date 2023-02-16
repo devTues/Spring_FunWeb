@@ -48,6 +48,12 @@ public class BoardDAOImpl implements BoardDAO{
 	public BoardDTO getBoard(int num) {
 		return sqlSession.selectOne(namespace+".getBoard", num);
 	}
+
+	@Override
+	public void updateBoard(BoardDTO boardDTO) {
+		sqlSession.update(namespace+".updateBoard", boardDTO);
+		
+	}
 	
 	
 

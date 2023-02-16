@@ -13,6 +13,7 @@ public interface BoardDAO {
 	public int getBoardCount();
 	public BoardDTO getBoard(int num);
 	public void updateReadcount(int num);
+	public void updateBoard(BoardDTO boardDTO);
 	
 
 }

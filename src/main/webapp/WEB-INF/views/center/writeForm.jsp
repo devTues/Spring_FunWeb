@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>     
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,14 +9,6 @@
 <link href="${pageContext.request.contextPath }/resources/css/default.css" rel="stylesheet" type="text/css">
 <link href="${pageContext.request.contextPath }/resources/css/subpage.css" rel="stylesheet" type="text/css">
 </head>
-<%
-//세션값 가져오기
-String id=(String)session.getAttribute("id");
-if(id==null){
-// 	response.sendRedirect("./BoardList.bo");
-// response.sendRedirect("${pageContext.request.contextPath }/member/insert");
-}
-%>
 <body>
 <div id="wrap">
 <!-- 헤더들어가는 곳 -->
@@ -44,7 +37,7 @@ if(id==null){
 <form action="${pageContext.request.contextPath }/board/writePro" method="post">
 <table id="notice">
 <tr><td>글쓴이</td>
-    <td><input type="text" name="name" value="<%=id%>" readonly></td></tr>
+    <td><input type="text" name="name" value="${sessionScope.id}" readonly></td></tr>
 <tr><td>글제목</td>
     <td><input type="text" name="subject"></td></tr>
 <tr><td>글내용</td>

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.itwillbs.domain.BoardDTO;
+import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.domain.PageDTO;
 import com.itwillbs.service.BoardService;
 
@@ -83,12 +84,24 @@ public class BoardController {
 		BoardDTO boardDTO=boardService.getBoard(num);
 		model.addAttribute("boardDTO", boardDTO);
 		return "center/content";
-	} // update 메서드
+	} 
+	
+	@RequestMapping(value = "/board/update", method = RequestMethod.GET)
+	public String update(Model model) {
+		return "/center/updateForm"; 
+	}
+	
+	@RequestMapping(value = "/board/updatePro", method = RequestMethod.POST)
+	public String updatePro(BoardDTO boardDTO, Model model, HttpServletRequest request) {
+		boardService.updateBoard(boardDTO);
+		return "redirect:/center/content";
+	} // updatePro 메서드
+	
 	
 	@RequestMapping(value = "/board/fwrite", method = RequestMethod.GET)
 	public String fwrite(Model model, HttpServletRequest request) {
 		return "center/fwriteForm";
-	} // update 메서드
+	} 
 	
 	@RequestMapping(value = "/board/fwritePro", method = RequestMethod.POST)
 	public String fwritePro(HttpServletRequest request, MultipartFile file) throws Exception{
