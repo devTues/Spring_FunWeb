@@ -2,31 +2,82 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
 <mapper namespace="com.itwillbs.mappers.boardMapper">
 
-  	<insert id="insertBoard">
-		insert into board(num,name,subject,content,readcount,date,file)
-		values(#{num},#{name},#{subject},#{content},#{readcount},#{date},#{file})
-	</insert>
+<!-- https://mybatis.org/mybatis-3/ko/index.html -->
+
+	<resultMap id="boardMap" type="Map">
+		<id column="num" property="boardNum" />
+		<result column="name" property="boardName" />
+		<result column="subject" property="boardSubject" />
+		<result column="content" property="boardContent" />
+		<result column="readcount" property="boardReadcount" />
+		<result column="date" property="boardDate" />
+		
 	
-	<select id="getMaxNum" resultType="java.lang.Integer">
-		select max(num) from board
+	</resultMap>
+
+	<select id="getBoardListMap" resultMap="boardMap">
+		select * from board
+		 order by num desc
 	</select>
 	
-	<select id="getBoardList" resultType="com.itwillbs.domain.BoardDTO">
-		select * from board order by num desc limit #{startRow},#{pageSize}
-	</select>
-	
-	<select id="getBoardCount" resultType="java.lang.Integer">
-		select count(*) from board
-	</select>
-	
-	<update id="updateReadcount">
-		update board set readcount=readcount+1 where num=#{num}
-	</update>
-	
-	<select id="getBoard" resultType="com.itwillbs.domain.BoardDTO">
-		select * from board where num=#{num}
-	</select>
-	
+
+   <insert id="insertBoard">
+<!--   	insert into board(num,name,subject,content,readcount,date,file)  -->
+<!--   	values(#{num},#{name},#{subject},#{content},#{readcount},#{date},#{file}) -->
+  	
+  	insert into reboard(num,name,subject,content,readcount,date,re_ref,re_lev,re_seq) 
+  	values(#{num},#{name},#{subject},#{content},#{readcount},#{date},#{re_ref},#{re_lev},#{re_seq})
+  	
+  </insert>
+  
+  <select id="getMaxNum" resultType="java.lang.Integer">
+<!--     select max(num) from board -->
+
+		select max(num) from reboard
+  </select>
+ 
+  <select id="getBoardList" resultType="com.itwillbs.domain.BoardDTO">
+<!--     select * from board order by num desc limit #{startRow},#{pageSize} -->
+
+		select * from reboard order by re_ref desc, re_seq asc limit #{startRow},#{pageSize}
+  </select>
+  
+  <select id="getBoardCount" resultType="java.lang.Integer">
+<!--   	select count(*) from board -->
+
+		select count(*) from reboard
+  </select>
+  
+  <update id="updateReadcount">
+  	update board set readcount=readcount+1 where num=#{num}
+  </update>
+  
+  <select id="getBoard" resultType="com.itwillbs.domain.BoardDTO">
+<!--  	 select * from board where num=#{num} -->
+
+		select * from reboard where num=#{num}
+  </select>
+
+  <update id="updateBoard">
+  	update board 
+  	set subject=#{subject}, content=#{content}
+  	where num=#{num}
+  </update>
+  
+  <delete id="deleteBoard">
+  	delete from board
+  	where num=#{num}
+  </delete>
+  
+   <update id="updateReSeq">
+  	update reboard 
+  	set re_seq = re_seq + 1
+  	where re_ref = #{re_ref} and re_seq > #{re_seq}
+  </update>
+  
+ 
 </mapper>
+

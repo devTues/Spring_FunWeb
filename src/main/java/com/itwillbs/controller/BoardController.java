@@ -2,12 +2,12 @@ package com.itwillbs.controller;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,155 +15,175 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartRequest;
 
 import com.itwillbs.domain.BoardDTO;
-import com.itwillbs.domain.MemberDTO;
 import com.itwillbs.domain.PageDTO;
 import com.itwillbs.service.BoardService;
 
 @Controller
 public class BoardController {
-	
+	// ê°ì²´ìƒì„±
 	@Inject
 	private BoardService boardService;
-	@Resource(name="uploadPath")
+	
+	//xml ì—…ë¡œë“œ ê²½ë¡œ (ìì›ì´ë¦„)=> ë³€ìˆ˜ ì €ì¥
+	@Resource(name = "uploadPath")
 	private String uploadPath;
 	
-	@RequestMapping(value = "/board/write", method = RequestMethod.GET)
+	@RequestMapping(value = "/board/write", method = RequestMethod.GET)	
 	public String write() {
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
 		return "center/writeForm";
-	} 
+	}//
 	
-	@RequestMapping(value = "/board/writePro", method = RequestMethod.POST)
-	public String writePro(BoardDTO boardDTO, HttpSession session) {
+	@RequestMapping(value = "/board/writePro", method = RequestMethod.POST)	
+	public String writePro(BoardDTO boardDTO) {
+		// insertBoard(boardDTO) ë©”ì„œë“œ í˜¸ì¶œ
 		boardService.insertBoard(boardDTO);
+		
 		return "redirect:/board/list";
-	} // insertPro ¸Ş¼­µå
+	}//
 	
-	@RequestMapping(value = "/board/list", method = RequestMethod.GET)
-	public String list(Model model, HttpServletRequest request) {
-		int pageSize=10;
+	@RequestMapping(value = "/board/list", method = RequestMethod.GET)	
+	public String list(HttpServletRequest request,Model model) {
+		//í™”ë©´ì— ë³´ì—¬ì¤„ ê¸€ê°œìˆ˜ 
+		int pageSize=15;
+		//í˜ì´ì§€ ë²ˆí˜¸ ê°€ì ¸ì˜¤ê¸°
 		String pageNum=request.getParameter("pageNum");
 		if(pageNum==null) {
 			pageNum="1";
 		}
 		int currentPage=Integer.parseInt(pageNum);
-		
 		PageDTO pageDTO=new PageDTO();
-		// set¸Ş¼­µå È£Ãâ
 		pageDTO.setPageSize(pageSize);
 		pageDTO.setPageNum(pageNum);
 		pageDTO.setCurrentPage(currentPage);
 		
-		List<BoardDTO> boardList = boardService.getBoardList(pageDTO);
+		List<BoardDTO> boardList=boardService.getBoardList(pageDTO);
 		
 		int count=boardService.getBoardCount();
-		int pageBlock=10;
+		
+		int pageBlock=10; 
 		int startPage=(currentPage-1)/pageBlock*pageBlock+1;
 		int endPage=startPage+pageBlock-1;
-		int pageCount=count/pageSize+(count%pageSize== 0 ? 0 : 1);
-		if(endPage>pageCount) {
-			endPage=pageCount;
-		}
-		pageDTO.setCount(pageCount);
+		int pageCount = count/pageSize+(count%pageSize==0 ? 0 : 1);
+		if(endPage > pageCount){
+	 	   endPage=pageCount;
+	    }
+		pageDTO.setCount(count);
 		pageDTO.setPageBlock(pageBlock);
 		pageDTO.setStartPage(startPage);
 		pageDTO.setEndPage(endPage);
 		pageDTO.setPageCount(pageCount);
 		
+		//ë°ì´í„° ë‹´ê¸°
 		model.addAttribute("boardList", boardList);
-		model.addAttribute("pageDto",pageDTO);
-		return "center/notice"; // Æú´õ¸í/ÆÄÀÏÀÌ¸§
-	} // insertPro ¸Ş¼­µå
+		model.addAttribute("pageDTO", pageDTO);
+		
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
+		return "center/notice";
+	}//
 	
-	
-	@RequestMapping(value = "/board/content", method = RequestMethod.GET)
-	public String content(Model model, HttpServletRequest request) {
-		int num=Integer.parseInt(request.getParameter("num"));
-		boardService.updateReadcount(num);
-		BoardDTO boardDTO=boardService.getBoard(num);
-		model.addAttribute("boardDTO", boardDTO);
-		return "center/content";
-	} 
-	
-	@RequestMapping(value = "/board/update", method = RequestMethod.GET)
-	public String update(Model model) {
-		return "/center/updateForm"; 
-	}
-	
-	@RequestMapping(value = "/board/updatePro", method = RequestMethod.POST)
-	public String updatePro(BoardDTO boardDTO, Model model, HttpServletRequest request) {
-		boardService.updateBoard(boardDTO);
-		return "redirect:/center/content";
-	} // updatePro ¸Ş¼­µå
-	
-	
-	@RequestMapping(value = "/board/fwrite", method = RequestMethod.GET)
-	public String fwrite(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/board/fwrite", method = RequestMethod.GET)	
+	public String fwrite() {
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
 		return "center/fwriteForm";
-	} 
+	}//
 	
-	@RequestMapping(value = "/board/fwritePro", method = RequestMethod.POST)
-	public String fwritePro(HttpServletRequest request, MultipartFile file) throws Exception{
-		// ¾÷·Îµå ÆÄÀÏ¸í => ·£´ı¹®ÀÚ_ÆÄÀÏÀÌ¸§
+	@RequestMapping(value = "/board/fwritePro", method = RequestMethod.POST)	
+	public String fwritePro(HttpServletRequest request,MultipartFile file) throws Exception{
+		// ì—…ë¡œë“œ íŒŒì¼ëª… => ëœë¤ë¬¸ì_íŒŒì¼ì´ë¦„ => íŒŒì¼ì´ë¦„ ì¤‘ë³µ ì•ˆë¨
 		UUID uuid=UUID.randomUUID();
 		String filename=uuid.toString()+"_"+file.getOriginalFilename();
-		// ¿øº»ÆÄÀÏÀ» º¹»çÇØ¼­ upload Æú´õ¿¡ ºÙ¿©³Ö±â
-		FileCopyUtils.copy(file.getBytes(), new File(uploadPath,filename));
-		// BoardDTO °´Ã¼»ı¼º => ÀúÀå
-		BoardDTO boardDTO=new BoardDTO();
-		boardDTO.setName(request.getParameter("name"));
-		boardDTO.setSubject(request.getParameter("subject"));
-		boardDTO.setContent(request.getParameter("content"));
-		boardDTO.setFile(filename);
 		
+		// ì›ë³¸ íŒŒì¼ ë³µì‚¬ => upload ë³µì‚¬
+//		FileCopyUtils.copy(ì›ë³¸, ë³µì‚¬í•´ì„œ ìƒˆë¡­ê²Œ íŒŒì¼ ë§Œë“¤ê¸°);
+		FileCopyUtils.copy(file.getBytes(), new File(uploadPath, filename));
+		
+		// BoardDTO ê°ì²´ìƒì„± <= ì €ì¥
+		 BoardDTO boardDTO=new BoardDTO();
+		 boardDTO.setName(request.getParameter("name"));
+		 boardDTO.setSubject(request.getParameter("subject"));
+		 boardDTO.setContent(request.getParameter("content"));
+		 boardDTO.setFile(filename);
+		
+		// insertBoard(boardDTO) ë©”ì„œë“œ í˜¸ì¶œ
 		boardService.insertBoard(boardDTO);
+		
 		return "redirect:/board/list";
-	} // insertPro ¸Ş¼­µå
+	}//
 	
-	@RequestMapping(value = "/board/flist", method = RequestMethod.GET)
-	public String flist(Model model, HttpServletRequest request) {
-		int pageSize=10;
-		String pageNum=request.getParameter("pageNum");
-		if(pageNum==null) {
-			pageNum="1";
-		}
-		int currentPage=Integer.parseInt(pageNum);
-		
-		PageDTO pageDTO=new PageDTO();
-		// set¸Ş¼­µå È£Ãâ
-		pageDTO.setPageSize(pageSize);
-		pageDTO.setPageNum(pageNum);
-		pageDTO.setCurrentPage(currentPage);
-		
-		List<BoardDTO> boardList = boardService.getBoardList(pageDTO);
-		
-		int count=boardService.getBoardCount();
-		int pageBlock=10;
-		int startPage=(currentPage-1)/pageBlock*pageBlock+1;
-		int endPage=startPage+pageBlock-1;
-		int pageCount=count/pageSize+(count%pageSize== 0 ? 0 : 1);
-		if(endPage>pageCount) {
-			endPage=pageCount;
-		}
-		pageDTO.setCount(pageCount);
-		pageDTO.setPageBlock(pageBlock);
-		pageDTO.setStartPage(startPage);
-		pageDTO.setEndPage(endPage);
-		pageDTO.setPageCount(pageCount);
-		
-		model.addAttribute("boardList", boardList);
-		model.addAttribute("pageDto",pageDTO);
-		return "center/fnotice"; // Æú´õ¸í/ÆÄÀÏÀÌ¸§
-	} // insertPro ¸Ş¼­µå
-	
-	@RequestMapping(value = "/board/fcontent", method = RequestMethod.GET)
-	public String fcontent(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/board/content", method = RequestMethod.GET)	
+	public String content(HttpServletRequest request,Model model) {
 		int num=Integer.parseInt(request.getParameter("num"));
-		boardService.updateReadcount(num);
-		BoardDTO boardDTO=boardService.getBoard(num);
+		
+		BoardDTO dto=boardService.getBoard(num);
+		
+		model.addAttribute("dto", dto);
+		
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
+		return "center/content";
+	}//
+	
+	
+	@RequestMapping(value = "/board/update", method = RequestMethod.GET)	
+	public String update(HttpServletRequest request,Model model) {
+		int num=Integer.parseInt(request.getParameter("num"));
+		
+		BoardDTO dto=boardService.getBoard(num);
+		
+		model.addAttribute("dto", dto);
+		
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
+		return "center/updateForm";
+	}//
+	
+	@RequestMapping(value = "/board/updatePro", method = RequestMethod.POST)	
+	public String updatePro(BoardDTO boardDTO) {
+		// updateBoard(boardDTO) ë©”ì„œë“œ í˜¸ì¶œ
+		boardService.updateBoard(boardDTO);
+		
+		return "redirect:/board/list";
+	}//
+	
+	@RequestMapping(value = "/board/delete", method = RequestMethod.GET)	
+	public String delete(HttpServletRequest request) {
+		int num=Integer.parseInt(request.getParameter("num"));
+		
+		boardService.deleteBoard(num);
+		
+		return "redirect:/board/list";
+	}//
+	
+	@RequestMapping(value = "/board/rewrite", method = RequestMethod.GET)	
+	public String rewrite(BoardDTO boardDTO, Model model) {
+		// /board/rewrite?num=${dto.num}
+		//re_ref, re_lev, re_seq ê°€ì ¸ì˜¤ê¸°
+		boardDTO=boardService.getBoard(boardDTO.getNum());
+		
 		model.addAttribute("boardDTO", boardDTO);
-		return "center/fcontent";
-	} // update ¸Ş¼­µå
-
-}
+		
+		// ê¸°ë³¸ ì´ë™ë°©ì‹ : ì£¼ì†Œë³€ê²½ ì—†ì´ ì´ë™ 
+		return "center/rewriteForm";
+	}//
+	
+	@RequestMapping(value = "/board/rewritePro", method = RequestMethod.POST)	
+	public String rewritePro(BoardDTO boardDTO) {
+		// insertBoard(boardDTO) ë©”ì„œë“œ í˜¸ì¶œ
+		boardService.reinsertBoard(boardDTO);
+		
+		return "redirect:/board/list";
+	}//
+	
+	@RequestMapping(value = "/board/listmap", method = RequestMethod.POST)	
+	public String listmap(HttpServletRequest request, Model model) {
+		List<Map<String, Object>> boardListMap = boardService.getBoardListMap();
+		
+		model.addAttribute("boardListMap", boardListMap);
+		
+		return "center/noticemap";
+	}//
+	
+	
+}//
